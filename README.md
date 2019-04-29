@@ -1,4 +1,4 @@
-*Psst — looking for a shareable component template? Go here --> [sveltejs/component-template](https://github.com/sveltejs/component-template)*
+_Psst — looking for a shareable component template? Go here --> [sveltejs/component-template](https://github.com/sveltejs/component-template)_
 
 ---
 
@@ -13,8 +13,11 @@ npx degit sveltejs/template svelte-app
 cd svelte-app
 ```
 
-*Note that you will need to have [Node.js](https://nodejs.org) installed.*
+_Note that you will need to have [Node.js](https://nodejs.org) installed._
 
+## Specific docs
+
+- Download the planning and put it in `public/data/planning.csv`
 
 ## Get started
 
@@ -32,7 +35,6 @@ npm run dev
 ```
 
 Navigate to [localhost:5000](http://localhost:5000). You should see your app running. Edit a component file in `src`, save it, and reload the page to see your changes.
-
 
 ## Deploying to the web
 

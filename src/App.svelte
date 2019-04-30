@@ -3,14 +3,15 @@
   // import Papa from "papaparse";
 
   import { ajax } from "rxjs/ajax";
-  import { pluck, startWith, tap, map } from "rxjs/operators";
-  import Row from "./Row.svelte";
+  import { pluck, startWith, tap, map, flatMap, toArray } from "rxjs/operators";
+  import Day from "./Day.svelte";
+  import toPlanning from "./toPlanning";
 
-  const rows$ = ajax({ url: "data/planning.csv", responseType: "text" }).pipe(
+  const planning$ = ajax({ url: "data/planning.csv", responseType: "text" }).pipe(
     pluck("response"),
     map(csv => Papa.parse(csv)),
     pluck("data"),
-    tap(v => console.log(v)),
+    map(toPlanning),
     startWith([])
   );
 
@@ -27,11 +28,7 @@
 
 <div>
 
-<table>
-  <tbody>
-  {#each $rows$ as row}
-    <Row row={row} />
+  {#each $planning$ as day}
+    <Day day={day} />
   {/each}
-  </tbody>
-</table>
 </div>

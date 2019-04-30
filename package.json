@@ -17,9 +17,14 @@
     "autobuild": "rollup -c -w",
     "dev": "run-p start:dev autobuild",
     "start": "sirv public",
-    "start:dev": "sirv public --dev"
+    "start:dev": "sirv public --dev",
+    "test": "jest"
   },
   "dependencies": {
+    "@babel/core": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "babel-jest": "^24.7.1",
+    "jest": "^24.7.1",
     "papaparse": "^4.6.3",
     "rxjs": "^6.5.1"
   }

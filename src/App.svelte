@@ -24,10 +24,9 @@
   }
 </style>
 
-<h1>Coucou {name}!</h1>
+<h1>Le Chouette Planning</h1>
 
 <div>
-
   {#each $planning$ as day}
     <Day day={day} />
   {/each}

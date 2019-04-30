@@ -118,4 +118,24 @@ describe("toPlanning", () => {
     );
     expect(actualSlotsPerTasksOfFirstDay).toEqual([4, 3]);
   });
+
+  it("should return the date from the majority of slots", () => {
+    const slotWithDate = date => {
+      let slot = [...slotRow];
+      slot[1] = date;
+      return slot;
+    };
+
+    const planning = [
+      newDayRow,
+      dayHeadingRow,
+      taskNameRow,
+      slotWithDate("01/07/2019"),
+      slotWithDate("01/06/2019"),
+      slotWithDate("01/06/2019")
+    ];
+
+    const actualDate = SUT(planning)[0].getDate();
+    expect(actualDate).toEqual(new Date("2019-06-01"));
+  });
 });

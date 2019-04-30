@@ -1,3 +1,13 @@
+// see https://stackoverflow.com/a/20762713
+const mostFrequentValueIn = values =>
+  [...values]
+    .filter(Boolean)
+    .sort(
+      (a, b) =>
+        values.filter(v => v === a).length - values.filter(v => v === b).length
+    )
+    .pop();
+
 const WorkDay = (label, tasks = []) => {
   return {
     label,
@@ -7,7 +17,8 @@ const WorkDay = (label, tasks = []) => {
       const latestTask = tasks.pop();
       return WorkDay(label, [...tasks, latestTask.addSlot(slot)]);
     },
-    isOpened: () => tasks.some(task => task.isStaffed())
+    isOpened: () => tasks.some(task => task.isStaffed()),
+    getDate: () => mostFrequentValueIn(tasks.map(task => task.getDate()))
   };
 };
 const Task = (label, slots = []) => {
@@ -15,7 +26,8 @@ const Task = (label, slots = []) => {
     label,
     slots,
     addSlot: slot => Task(label, [...slots, slot]),
-    isStaffed: () => slots.length > 0
+    isStaffed: () => slots.length > 0,
+    getDate: () => mostFrequentValueIn(slots.map(slot => slot.date))
   };
 };
 
@@ -41,8 +53,13 @@ const TaskNameRow = data => {
   };
 };
 const SlotRow = data => {
+  const dateFromFrenchFormat = source => {
+    const [d, M, Y] = source.split("/");
+    return new Date(`${Y}-${M}-${d}`);
+  };
   const slot = {
     label: data[0],
+    date: dateFromFrenchFormat(data[1]),
     hours: data[1],
     person: data[3] && {
       firstName: data[4],

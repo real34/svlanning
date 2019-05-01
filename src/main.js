@@ -1,9 +1,10 @@
 import App from "./App.svelte";
 
+const sheetId = "TODO";
 const app = new App({
   target: document.body,
   props: {
-    name: "lala"
+    planningUrl: `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&id=${sheetId}`
   }
 });
 

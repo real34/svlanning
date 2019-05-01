@@ -4,30 +4,34 @@
 
   import { ajax } from "rxjs/ajax";
   import { pluck, startWith, tap, map, flatMap, toArray } from "rxjs/operators";
-  import Day from "./Day.svelte";
+  import Planning from "./Planning.svelte";
   import toPlanning from "./toPlanning";
 
-  const planning$ = ajax({ url: "data/planning.csv", responseType: "text" }).pipe(
-    pluck("response"),
-    map(csv => Papa.parse(csv)),
-    pluck("data"),
-    map(toPlanning),
-    startWith([])
-  );
+  export let planningUrl;
 
-  export let name;
+  const planning = new Promise((complete, error) =>
+    Papa.parse(planningUrl, {
+      download: true,
+      complete,
+      error
+    })
+  )
+    .then(result => result.data)
+    .then(toPlanning);
 </script>
 
 <style>
   h1 {
-    color: purple;
+    color: #445448;
   }
 </style>
 
 <h1>Le Chouette Planning</h1>
 
 <div>
-  {#each $planning$ as day}
-    <Day day={day} />
-  {/each}
+  {#await planning}
+    Chargement du planning en cours…
+  {:then days}
+    <Planning days={days} />
+  {/await}
 </div>

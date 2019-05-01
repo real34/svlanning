@@ -19,6 +19,8 @@ _Note that you will need to have [Node.js](https://nodejs.org) installed._
 
 - Download the planning and put it in `public/data/planning.csv`
 
+- [ ] corriger les dates dans le planning pour MARDI 16 OCTOBRE 2018 (2017)
+
 ## Get started
 
 Install the dependencies...

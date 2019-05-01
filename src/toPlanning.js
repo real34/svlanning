@@ -55,12 +55,12 @@ const TaskNameRow = data => {
 const SlotRow = data => {
   const dateFromFrenchFormat = source => {
     const [d, M, Y] = source.split("/");
-    return new Date(`${Y}-${M}-${d}`);
+    return new Date(`${Math.max(Y, 2018)}-${M}-${d}`);
   };
   const slot = {
     label: data[0],
     date: dateFromFrenchFormat(data[1]),
-    hours: data[1],
+    hours: data[2],
     person: data[3] && {
       firstName: data[4],
       lastName: data[3],

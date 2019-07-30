@@ -7,6 +7,9 @@
   import startOfWeek from "date-fns/startOfWeek";
   import endOfWeek from "date-fns/endOfWeek";
   import format from "date-fns/format";
+  import startOfMonth from "date-fns/startOfMonth";
+  import endOfMonth from "date-fns/endOfMonth";
+  import addMonths from "date-fns/addMonths";
   import getDay from "date-fns/getDay";
 
   import Day from "./Day.svelte";
@@ -33,9 +36,10 @@
     return weeks;
   };
 
+  let from = startOfMonth(new Date());
+  let to = endOfMonth(new Date());
+
   $: dates = days.map(day => day.getDate());
-  $: from = min(dates);
-  $: to = max(dates);
   $: closestIndex = closestIndexTo(new Date(), dates);
   $: daysRange = eachDayOfInterval({
     start: startOfWeek(from, dateOptions),
@@ -46,6 +50,12 @@
       openingDay: days.find(day => isSameDay(date, day.getDate()))
     }))
     .reduce(perWeek, new Map());
+
+  const handleChangeMonth = offset => () => {
+    const newMonth = addMonths(from, offset);
+    from = startOfMonth(newMonth);
+    to = endOfMonth(newMonth);
+  };
 </script>
 
 <style>
@@ -131,19 +141,32 @@
 
 <div>
   {#if closestIndex}
-    <h2>Du <FormattedDate date={from} /> au <FormattedDate date={to}/></h2>
+    <h2>
+      Du
+      <FormattedDate date={from} />
+      au
+      <FormattedDate date={to} />
+    </h2>
+
+    <p>
+      <button on:click={handleChangeMonth(-1)}>« Mois précédent</button>
+      <button on:click={handleChangeMonth(1)}>Mois suivant »</button>
+    </p>
 
     <div class="minimap">
       {#each [...daysRange.values()] as week}
         <div class="week">
           <div class="weekname">S{week.label}</div>
           {#each week.days as day}
-            <div class="day day-{getDay(day.date)}" class:opened={day.openingDay} class:today={isSameDay(day.date, new Date())}>
+            <div
+              class="day day-{getDay(day.date)}"
+              class:opened={day.openingDay}
+              class:today={isSameDay(day.date, new Date())}>
               <div class="day-label">{format(day.date, 'dd/MM')}</div>
               {#if day.openingDay}
                 {#each day.openingDay.tasks as task}
                   {#each task.slots as slot}
-                    <div class="slot" class:filled="{slot.person}"></div>
+                    <div class="slot" class:filled={slot.person} />
                   {/each}
                 {/each}
               {/if}

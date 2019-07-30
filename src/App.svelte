@@ -33,9 +33,20 @@
   h1 {
     color: #445448;
   }
+
+  .warning {
+    background-color: orange;
+    padding: 1rem;
+    font-size: 0.8rem;
+  }
 </style>
 
 <h1>Le Chouette Planning</h1>
+
+<p class="warning">
+  Ce site est un prototype expérimental dont le but est de permettre un début de
+  discussion sur un nouvel outil. Il n'est en aucun cas final et officiel !
+</p>
 
 <div>
   {#if !sheetId}

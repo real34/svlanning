@@ -38,9 +38,12 @@
 
   let from = startOfMonth(new Date());
   let to = endOfMonth(new Date());
+  let currentIndex;
 
   $: dates = days.map(day => day.getDate());
   $: closestIndex = closestIndexTo(new Date(), dates);
+  $: currentDay = days[currentIndex || closestIndex];
+
   $: daysRange = eachDayOfInterval({
     start: startOfWeek(from, dateOptions),
     end: endOfWeek(to, dateOptions)
@@ -55,6 +58,10 @@
     const newMonth = addMonths(from, offset);
     from = startOfMonth(newMonth);
     to = endOfMonth(newMonth);
+  };
+
+  const handleOpenDay = date => () => {
+    currentIndex = closestIndexTo(date, dates);
   };
 </script>
 
@@ -122,6 +129,7 @@
     width: 100%;
     height: 100%;
     background: rgba(255, 255, 255, 0.8);
+    margin: 0;
   }
   .day:hover .day-label {
     visibility: visible;
@@ -140,7 +148,7 @@
 </style>
 
 <div>
-  {#if closestIndex}
+  {#if currentDay}
     <h2>
       Du
       <FormattedDate date={from} />
@@ -162,7 +170,9 @@
               class="day day-{getDay(day.date)}"
               class:opened={day.openingDay}
               class:today={isSameDay(day.date, new Date())}>
-              <div class="day-label">{format(day.date, 'dd/MM')}</div>
+              <button on:click={handleOpenDay(day.date)} class="day-label">
+                {format(day.date, 'dd/MM')}
+              </button>
               {#if day.openingDay}
                 {#each day.openingDay.tasks as task}
                   {#each task.slots as slot}
@@ -176,6 +186,6 @@
       {/each}
     </div>
 
-    <Day day={days[closestIndex]} />
+    <Day day={currentDay} />
   {/if}
 </div>

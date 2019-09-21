@@ -1,31 +1,47 @@
 <script>
   /*global Papa */
 
+  import ApolloClient, { gql } from "apollo-boost";
+  import { setClient, getClient, query } from "svelte-apollo";
+
   import { ajax } from "rxjs/ajax";
   import { pluck, startWith, tap, map, flatMap, toArray } from "rxjs/operators";
   import Planning from "./Planning.svelte";
   import toPlanning from "./toPlanning";
 
-  let sheetId;
-  $: planningUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&id=${sheetId}`;
-  $: planning =
-    sheetId &&
-    new Promise((complete, error) =>
-      Papa.parse(planningUrl, {
-        download: true,
-        complete,
-        error
-      })
-    )
-      .then(result => result.data)
-      .then(toPlanning);
+  import tokenJWT from "./stores/authToken";
+
+  $: client = new ApolloClient({
+    uri: "https://api.lachouettecoop.fr",
+    headers: $tokenJWT ? {
+      Authorization: $tokenJWT
+    } : {}
+  });
+  $: setClient(client);
+
+  $: version = query(client, {
+    query: gql`
+      {
+        version
+      }
+    `
+  });
+  $: user = query(client, {
+    query: gql`
+      {
+        me {
+          prenom
+        }
+      }
+    `
+  });
 
   function handleSubmit() {
-    sheetId = this.elements.identifiant.value.trim();
+    $tokenJWT = this.elements.token.value.trim();
   }
 
   function handleReset() {
-    sheetId = undefined;
+    $tokenJWT = undefined;
   }
 </script>
 
@@ -41,45 +57,38 @@
   }
 </style>
 
-<h1>Le Chouette Planning</h1>
+<h1>
+  Le Chouette Planning
+  {#await $version then result}
+    <small>(v{result.data.version})</small>
+  {/await}
+</h1>
 
 <p class="warning">
-  Ce site est un prototype expérimental dont le but est de permettre un début de
-  discussion sur un nouvel outil. Il n'est en aucun cas final et officiel !
+Ce site est un prototype expérimental dont le but est de permettre un début de
+discussion sur un nouvel outil. Il n'est en aucun cas final et officiel !
 </p>
 
 <div>
-  {#if !sheetId}
+  {#if !$tokenJWT}
     <form on:submit|preventDefault={handleSubmit}>
       <p>
-        Veuillez renseigner l'identifiant de la feuille Google Sheet contenant
-        le planning.
-        <br />
-        <em>
-          Exemple : https://docs.google.com/spreadsheets/d/
-          <strong>2QryWNsR34pRuUfz5HyQPEIlTDa9JiSp1kUorcU9merM</strong>
-          /edit
-        </em>
+        Veuillez renseigner votre token JWT pour accéder au planning.
       </p>
 
-      <label for="identifiant">Identifiant de la feuille</label>
-      <input name="identifiant" type="text" size="50" />
+      <label for="token">Token JWT</label>
+      <input name="token" type="text" size="50" />
 
-      <button type="submit">Afficher le planning</button>
+      <button type="submit">S'identifier</button>
     </form>
   {:else}
-    {#await planning}
-      Chargement du planning en cours…
-    {:then days}
-      <p>
-        <button on:click={handleReset}>Charger un autre planning</button>
-      </p>
-      <Planning {days} />
-    {:catch error}
-      <p>Une erreur est survenue : {error}</p>
-      <p>
-        <button on:click={handleReset}>Charger un autre planning</button>
-      </p>
-    {/await}
+    <p>
+      {#await $user then user}
+        Bienvenue {user.data.me.prenom} !
+      {/await}
+      <button on:click={handleReset}>Se déconnecter</button>
+    </p>
+
+    {"<Planning />"}
   {/if}
 </div>

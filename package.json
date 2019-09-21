@@ -25,10 +25,13 @@
     "@babel/preset-env": "^7.6.0",
     "@curi/router": "^2.0.1",
     "@hickory/browser": "^2.0.1",
+    "apollo-boost": "^0.4.4",
     "babel-jest": "^24.9.0",
     "date-fns": "^2.2.1",
+    "graphql": "^14.5.7",
     "jest": "^24.9.0",
     "papaparse": "^5.1.0",
-    "rxjs": "^6.5.3"
+    "rxjs": "^6.5.3",
+    "svelte-apollo": "^0.3.0"
   }
 }

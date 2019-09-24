@@ -28,6 +28,7 @@
 <div class="slot" class:filled="{taskSlot.person}">
 {#if !taskSlot.person}
   <span class="role">{taskSlot.label}</span>
+  Click to https://webapps.stackexchange.com/questions/44473/link-to-a-cell-in-a-google-sheets-via-url
   {#if taskSlot.notes}
     <p>Notes : {taskSlot.notes}</p>
   {/if}

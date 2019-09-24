@@ -89,6 +89,6 @@ discussion sur un nouvel outil. Il n'est en aucun cas final et officiel !
       <button on:click={handleReset}>Se déconnecter</button>
     </p>
 
-    {"<Planning />"}
+    <Planning />
   {/if}
 </div>

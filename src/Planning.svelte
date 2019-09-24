@@ -12,10 +12,11 @@
   import addMonths from "date-fns/addMonths";
   import getDay from "date-fns/getDay";
 
+  import { gql } from "apollo-boost";
+  import { getClient, query } from "svelte-apollo";
+
   import Day from "./Day.svelte";
   import FormattedDate from "./FormattedDate.svelte";
-
-  export let days;
 
   const dateOptions = { weekStartsOn: 1 };
   const perWeek = (weeks, day) => {
@@ -38,21 +39,50 @@
 
   let from = startOfMonth(new Date());
   let to = endOfMonth(new Date());
-  let currentIndex;
 
-  $: dates = days.map(day => day.getDate());
-  $: closestIndex = closestIndexTo(new Date(), dates);
-  $: currentDay = days[currentIndex || closestIndex];
+  const client = getClient();
 
-  $: daysRange = eachDayOfInterval({
-    start: startOfWeek(from, dateOptions),
-    end: endOfWeek(to, dateOptions)
+  // TODO Passer à Apollo normal… https://www.apollographql.com/docs/react/advanced/fragments/#fragments-on-unions-and-interfaces
+  const planning = query(client, {
+    query: gql`
+      fragment ChampsJourOuverture on JourOuverture {
+        creneaux {
+          nom
+          postes {
+            nom
+            horaires
+            piaffeur {
+              nom
+              prenom
+              telephone
+              email
+            }
+            notes
+          }
+        }
+      }
+
+      query planning {
+        planning {
+          date
+          labOuvert
+          ...ChampsJourOuverture
+        }
+      }
+    `
   })
-    .map(date => ({
-      date,
-      openingDay: days.find(day => isSameDay(date, day.getDate()))
-    }))
-    .reduce(perWeek, new Map());
+  // $: dates = days.map(day => day.getDate());
+  // $: closestIndex = closestIndexTo(new Date(), dates);
+
+  // $: daysRange = eachDayOfInterval({
+  //   start: startOfWeek(from, dateOptions),
+  //   end: endOfWeek(to, dateOptions)
+  // })
+  //   .map(date => ({
+  //     date,
+  //     openingDay: days.find(day => isSameDay(date, day.getDate()))
+  //   }))
+  //   .reduce(perWeek, new Map());
 
   const handleChangeMonth = offset => () => {
     const newMonth = addMonths(from, offset);
@@ -61,7 +91,7 @@
   };
 
   const handleOpenDay = date => () => {
-    currentIndex = closestIndexTo(date, dates);
+    // TODO currentIndex = closestIndexTo(date, dates);
   };
 </script>
 
@@ -148,7 +178,7 @@
 </style>
 
 <div>
-  {#if currentDay}
+  {#if true}
     <h2>
       Du
       <FormattedDate date={from} />
@@ -162,7 +192,12 @@
     </p>
 
     <div class="minimap">
-      {#each [...daysRange.values()] as week}
+      {#await $planning}
+        Chargement du planning en cours
+      {:then response}
+        <pre>{JSON.stringify(response.data.planning, null, 2)}</pre>
+      {/await}
+      <!-- {#each [...daysRange.values()] as week}
         <div class="week">
           <div class="weekname">S{week.label}</div>
           {#each week.days as day}
@@ -183,9 +218,9 @@
             </div>
           {/each}
         </div>
-      {/each}
+      {/each} -->
     </div>
 
-    <Day day={currentDay} />
+    <!-- <Day day={currentDay} /> -->
   {/if}
 </div>
